@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venox SHOP</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --text-light: #e0e0e0;
+            --accent-color: #6a5acd;
+            --accent-hover: #7b6ce0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Animierter Hintergrund */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(106, 90, 205, 0.1);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        header {
+            background-color: var(--bg-darker);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .shop-title {
+            color: var(--accent-color);
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .product-card {
+            background-color: var(--bg-darker);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #333;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-title {
+            margin-top: 0;
+            font-weight: 500;
+        }
+        
+        .product-price {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+        
+        .add-to-cart {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .add-to-cart:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        /* Modal Stile */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-darker);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            border: 1px solid #333;
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: var(--text-light);
+        }
+        
+        .modal-product {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .modal-product {
+                flex-direction: row;
+            }
+        }
+        
+        .modal-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .modal-details {
+            flex: 1;
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+        
+        .modal-price {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin: 1rem 0;
+        }
+        
+        .modal-description {
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+        
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+        
+        .quantity-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            margin: 0 0.5rem;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .buy-now {
+            background-color: #4CAF50;
+        }
+        
+        .buy-now:hover {
+            background-color: #45a049;
+        }
+        
+        /* Checkout Modal */
+        .checkout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
+            overflow-y: auto;
+        }
+        
+        .checkout-content {
+            background-color: var(--bg-darker);
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid #333;
+            animation: modalFadeIn 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .checkout-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .checkout-content::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: 4px;
+        }
+        
+        .checkout-title {
+            color: var(--accent-color);
+            margin-top: 0;
+        }
+        
+        .checkout-summary {
+            background-color: #1a1a1a;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .checkout-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .checkout-total {
+            font-weight: bold;
+            border-top: 1px solid #333;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Neue Stile für Lieferoptionen */
+        .delivery-options {
+            margin: 1.5rem 0;
+        }
+        
+        .delivery-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            background-color: #1a1a1a;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .delivery-option input {
+            margin-right: 1rem;
+        }
+        
+        .meeting-point {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #1a1a1a;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .meeting-point select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #333;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #333;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .payment-methods {
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-method {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            background-color: #1a1a1a;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .payment-method:hover {
+            background-color: #222;
+        }
+        
+        .payment-method input {
+            margin-right: 1rem;
+        }
+        
+        .payment-details {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #1a1a1a;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .crypto-address {
+            font-family: monospace;
+            background-color: #333;
+            padding: 0.5rem;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-top: 0.5rem;
+        }
+        
+        .checkout-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        .back-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .confirm-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .confirm-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animierter Hintergrund -->
+    <div class="bg-animation" id="bgAnimation"></div>
+    
+    <header>
+        <h1 class="shop-title">Venox SHOP</h1>
+    </header>
+    
+    <div class="container">
+        <div class="products">
+            <!-- Produkt 1 -->
+            <div class="product-card" onclick="openModal(0)">
+                <img src="https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&" alt="Produkt 1" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Dein Titel</h3>
+                    <p>Deine Beschreibung</p>
+                    <div class="product-price">€89.99</div>
+                </div>
+            </div>
+            
+            <!-- Produkt 2 -->
+            <div class="product-card" onclick="openModal(1)">
+                <img src="https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&" alt="Produkt 2" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Dein Titel</h3>
+                    <p>Deine Beschreibung</p>
+                    <div class="product-price">€129.99</div>
+                </div>
+            </div>
+            
+            <!-- Produkt 3 -->
+            <div class="product-card" onclick="openModal(2)">
+                <img src="https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&" alt="Produkt 3" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Dein Titel</h3>
+                    <p>Deine Beschreibung</p>
+                    <div class="product-price">€59.99</div>
+                </div>
+            </div>
+            
+            <!-- Produkt 4 -->
+            <div class="product-card" onclick="openModal(3)">
+                <img src="https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&" alt="Produkt 4" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Dein Titel</h3>
+                    <p>Deine Beschreibung</p>
+                    <div class="product-price">€24.99</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal für Produktdetails -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="modal-product">
+                <img id="modalProductImage" src="" alt="Produktbild" class="modal-image">
+                <div class="modal-details">
+                    <h2 id="modalProductTitle" class="modal-title"></h2>
+                    <div id="modalProductPrice" class="modal-price"></div>
+                    <p id="modalProductDescription" class="modal-description"></p>
+                    
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" id="productQuantity" class="quantity-input" value="1" min="1">
+                        <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button id="addToCartBtn" class="add-to-cart">In den Warenkorb</button>
+                        <button id="buyNowBtn" class="add-to-cart buy-now">Jetzt kaufen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="checkout-modal">
+        <div class="checkout-content">
+            <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
+            <h2 class="checkout-title">Bestellung abschließen</h2>
+            
+            <div class="checkout-summary">
+                <h3>Ihre Bestellung</h3>
+                <div id="checkoutItems" class="checkout-items">
+                    <!-- Dynamisch gefüllt -->
+                </div>
+                <div id="checkoutTotal" class="checkout-total">
+                    <!-- Dynamisch gefüllt -->
+                </div>
+            </div>
+            
+            <div id="checkoutForm">
+                <h3>Kontaktinformationen</h3>
+                <div class="form-group">
+                    <label for="fullName" class="form-label">Vollständiger Name</label>
+                    <input type="text" id="fullName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">E-Mail</label>
+                    <input type="email" id="email" class="form-input" required>
+                </div>
+                
+                <h3>Lieferoptionen</h3>
+                <div class="delivery-options">
+                    <div class="delivery-option" onclick="selectDeliveryOption('shipping')">
+                        <input type="radio" id="shipping" name="delivery" value="shipping" checked>
+                        <label for="shipping">Versand (Adresse angeben)</label>
+                    </div>
+                    
+                    <div class="delivery-option" onclick="selectDeliveryOption('pickup')">
+                        <input type="radio" id="pickup" name="delivery" value="pickup">
+                        <label for="pickup">Abholung (Treffpunkt auswählen)</label>
+                    </div>
+                </div>
+                
+                <div id="shippingAddress" class="address-form">
+                    <h3>Lieferadresse</h3>
+                    <div class="form-group">
+                        <label for="streetAddress" class="form-label">Straße und Hausnummer</label>
+                        <input type="text" id="streetAddress" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="city" class="form-label">Stadt</label>
+                        <input type="text" id="city" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="postalCode" class="form-label">Postleitzahl</label>
+                        <input type="text" id="postalCode" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="country" class="form-label">Land</label>
+                        <input type="text" id="country" class="form-input">
+                    </div>
+                </div>
+                
+                <div id="pickupLocation" class="meeting-point">
+                    <h3>Treffpunkt auswählen</h3>
+                    <select id="meetingPoint" class="form-input">
+                        <option value="Hauptbahnhof, Berlin">Hauptbahnhof, Berlin</option>
+                        <option value="Alexanderplatz, Berlin">Alexanderplatz, Berlin</option>
+                        <option value="Potsdamer Platz, Berlin">Potsdamer Platz, Berlin</option>
+                        <option value="Anderer Ort (per Nachricht)">Anderer Ort (wir kontaktieren Sie)</option>
+                    </select>
+                </div>
+                
+                <h3>Zahlungsmethode</h3>
+                <div class="payment-methods">
+                    <div class="payment-method" onclick="selectPaymentMethod('bitcoin')">
+                        <input type="radio" id="bitcoin" name="paymentMethod" value="bitcoin" checked>
+                        <label for="bitcoin">Bitcoin (BTC)</label>
+                    </div>
+                    
+                    <div class="payment-method" onclick="selectPaymentMethod('monero')">
+                        <input type="radio" id="monero" name="paymentMethod" value="monero">
+                        <label for="monero">Monero (XMR)</label>
+                    </div>
+                </div>
+                
+                <div id="bitcoinDetails" class="payment-details">
+                    <p>Bitte senden Sie die Zahlung an folgende Bitcoin-Adresse:</p>
+                    <div class="crypto-address">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div>
+                    <p>Gesamtbetrag: <span id="bitcoinAmount">0</span> BTC</p>
+                    <p>Bitte beachten Sie, dass die Transaktion mehrere Bestätigungen benötigen kann.</p>
+                </div>
+                
+                <div id="moneroDetails" class="payment-details">
+                    <p>Bitte senden Sie die Zahlung an folgende Monero-Adresse:</p>
+                    <div class="crypto-address">48jY7dLQkR5LmwVobQp3YqPK8yWkaXZQ4nJhZJQ1vJ5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5J5</div>
+                    <p>Gesamtbetrag: <span id="moneroAmount">0</span> XMR</p>
+                    <p>Bitte beachten Sie, dass die Transaktion mehrere Bestätigungen benötigen kann.</p>
+                </div>
+                
+                <div class="checkout-buttons">
+                    <button class="back-btn" onclick="closeCheckoutModal()">Zurück</button>
+                    <button class="confirm-btn" onclick="completePurchase()">Kauf bestätigen</button>
+                </div>
+            </div>
+            
+            <div id="successMessage" class="success-message" style="display: none;">
+                <div class="success-icon">✓</div>
+                <h2>Vielen Dank für Ihren Kauf!</h2>
+                <p>Ihre Bestellung wurde erfolgreich aufgegeben.</p>
+                <p>Die Details wurden an unseren Discord gesendet.</p>
+                <button class="confirm-btn" onclick="closeCheckoutModal()">Fertig</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Produktdaten
+        const products = [
+            {
+                title: "Dein Titel",
+                price: "€89.99",
+                image: "https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&",
+                description: "deine Beschreibung"
+            },
+            {
+                title: "Dein Titel",
+                price: "€129.99",
+                image: "https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&",
+                description: "deine Beschreibung"
+            },
+            {
+                title: "Dein Titel",
+                price: "€59.99",
+                image: "https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&",
+                description: "deine Beschreibung"
+            },
+            {
+                title: "Dein Titel",
+                price: "€24.99",
+                image: "https://cdn.discordapp.com/attachments/1377288531587891283/1390090363859111997/F8E9E51F-AF13-4D8E-BD53-AE62010517D8.png?ex=6866fe09&is=6865ac89&hm=6d56e4a39cf0523e20984be854a448eeb8a2eeb1c8b779a0065356ad6b33eea4&",
+                description: "deine Beschreibung"
+            }
+        ];
+        
+        // Hintergrund-Animation
+        function createBackground() {
+            const bgAnimation = document.getElementById('bgAnimation');
+            const circleCount = 15;
+            
+            for (let i = 0; i < circleCount; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('bg-circle');
+                
+                // Zufällige Größe und Position
+                const size = Math.random() * 100 + 50;
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.left = `${Math.random() * 100}%`;
+                circle.style.top = `${Math.random() * 100}%`;
+                
+                // Zufällige Animationsdauer und Verzögerung
+                circle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                circle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                bgAnimation.appendChild(circle);
+            }
+        }
+        
+        // Modal-Funktionen
+        let currentProductIndex = 0;
+        
+        function openModal(index) {
+            currentProductIndex = index;
+            const product = products[index];
+            const modal = document.getElementById('productModal');
+            
+            document.getElementById('modalProductImage').src = product.image;
+            document.getElementById('modalProductTitle').textContent = product.title;
+            document.getElementById('modalProductPrice').textContent = product.price;
+            document.getElementById('modalProductDescription').textContent = product.description;
+            document.getElementById('productQuantity').value = 1;
+            
+            modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('productModal');
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+        
+        function changeQuantity(amount) {
+            const quantityInput = document.getElementById('productQuantity');
+            let newValue = parseInt(quantityInput.value) + amount;
+            
+            if (newValue < 1) newValue = 1;
+            quantityInput.value = newValue;
+        }
+        
+        // Lieferoptionen
+        function selectDeliveryOption(option) {
+            document.getElementById('shippingAddress').style.display = option === 'shipping' ? 'block' : 'none';
+            document.getElementById('pickupLocation').style.display = option === 'pickup' ? 'block' : 'none';
+            
+            // Pflichtfelder anpassen
+            const addressFields = document.querySelectorAll('#shippingAddress input');
+            addressFields.forEach(field => field.required = option === 'shipping');
+        }
+        
+        // Discord-Webhook-Integration
+        async function sendToDiscord(data) {
+            const webhookURL = 'https://discord.com/api/webhooks/1390094250628350053/3U1kf7q3zQOZCIzjkwm5V0IOYH30TNANl1KFa1CgSNdS5rlRG8ybeECvveajCexUW0fG';
+            
+            const embed = {
+                title: "🛒 Neue Bestellung im Venox Shop",
+                color: 0x6A0DAD, // Lila
+                fields: [
+                    { name: "Produkt", value: data.product, inline: true },
+                    { name: "Menge", value: data.quantity, inline: true },
+                    { name: "Preis", value: data.totalPrice, inline: true },
+                    { name: "Kunde", value: data.fullName, inline: true },
+                    { name: "E-Mail", value: data.email, inline: true },
+                    { name: "Lieferoption", value: data.deliveryMethod === 'shipping' ? 'Versand' : 'Abholung', inline: true },
+                    { 
+                        name: data.deliveryMethod === 'shipping' ? "Lieferadresse" : "Treffpunkt", 
+                        value: data.deliveryMethod === 'shipping' ? 
+                            `${data.streetAddress}, ${data.postalCode} ${data.city}, ${data.country}` : 
+                            data.meetingPoint 
+                    },
+                    { name: "Zahlungsmethode", value: data.paymentMethod, inline: true }
+                ],
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        content: `**Neue Bestellung von ${data.fullName}**`,
+                        embeds: [embed] 
+                    })
+                });
+                return true;
+            } catch (error) {
+                console.error("Fehler beim Senden an Discord:", error);
+                return false;
+            }
+        }
+        
+        // Checkout-Funktionen
+        function openCheckoutModal() {
+            const product = products[currentProductIndex];
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            const price = parseFloat(product.price.replace('€', ''));
+            const total = price * quantity;
+            
+            // Bestellzusammenfassung füllen
+            document.getElementById('checkoutItems').innerHTML = `
+                <div class="checkout-item">
+                    <span>${quantity}x ${product.title}</span>
+                    <span>€${(price * quantity).toFixed(2)}</span>
+                </div>
+            `;
+            
+            document.getElementById('checkoutTotal').innerHTML = `
+                <div class="checkout-item">
+                    <span>Gesamt</span>
+                    <span>€${total.toFixed(2)}</span>
+                </div>
+            `;
+            
+            // Krypto-Beträge aktualisieren
+            updateCryptoAmounts(total);
+            
+            // Standardmäßig Bitcoin-Zahlungsdetails anzeigen
+            selectPaymentMethod('bitcoin');
+            selectDeliveryOption('shipping');
+            
+            // Formular zurücksetzen und Erfolgsmeldung ausblenden
+            document.getElementById('checkoutForm').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            
+            // Modal anzeigen
+            document.getElementById('checkoutModal').style.display = "block";
+            closeModal();
+        }
+        
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+        
+        function selectPaymentMethod(method) {
+            // Radio-Button auswählen
+            document.getElementById(method).checked = true;
+            
+            // Alle Zahlungsdetails ausblenden
+            document.getElementById('bitcoinDetails').style.display = 'none';
+            document.getElementById('moneroDetails').style.display = 'none';
+            
+            // Ausgewählte Zahlungsmethode anzeigen
+            document.getElementById(`${method}Details`).style.display = 'block';
+            
+            // Krypto-Beträge aktualisieren
+            const total = getOrderTotal();
+            updateCryptoAmounts(total);
+        }
+        
+        function getOrderTotal() {
+            const product = products[currentProductIndex];
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            const price = parseFloat(product.price.replace('€', ''));
+            return price * quantity;
+        }
+        
+        function updateCryptoAmounts(total) {
+            // Hier würden Sie normalerweise aktuelle Wechselkurse abrufen
+            // Für dieses Beispiel verwenden wir feste Kurse
+            const btcRate = 50000; // 1 BTC = 50.000 EUR
+            const xmrRate = 200;   // 1 XMR = 200 EUR
+            
+            document.getElementById('bitcoinAmount').textContent = (total / btcRate).toFixed(8);
+            document.getElementById('moneroAmount').textContent = (total / xmrRate).toFixed(8);
+        }
+        
+        async function completePurchase() {
+            // Formular validieren
+            const formInputs = document.querySelectorAll('#checkoutForm input[required]');
+            let isValid = true;
+            
+            formInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#f44336';
+                } else {
+                    input.style.borderColor = '#444';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Bitte füllen Sie alle erforderlichen Felder aus.');
+                return;
+            }
+
+            // Daten sammeln
+            const product = products[currentProductIndex];
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            const totalPrice = parseFloat(product.price.replace('€', '')) * quantity;
+            
+            const deliveryMethod = document.querySelector('input[name="delivery"]:checked').value;
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            
+            const orderData = {
+                product: product.title,
+                quantity: quantity,
+                totalPrice: `€${totalPrice.toFixed(2)}`,
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                deliveryMethod: deliveryMethod,
+                paymentMethod: paymentMethod.toUpperCase(),
+                streetAddress: document.getElementById('streetAddress').value,
+                city: document.getElementById('city').value,
+                postalCode: document.getElementById('postalCode').value,
+                country: document.getElementById('country').value,
+                meetingPoint: deliveryMethod === 'pickup' ? document.getElementById('meetingPoint').value : null
+            };
+
+            // An Discord senden
+            const success = await sendToDiscord(orderData);
+            
+            if (success) {
+                // Erfolgsmeldung anzeigen
+                document.getElementById('checkoutForm').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+            } else {
+                alert('Fehler beim Senden der Bestellung. Bitte versuchen Sie es später erneut.');
+            }
+        }
+        
+        // Warenkorb-Funktionen
+        document.getElementById('addToCartBtn').addEventListener('click', function() {
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            alert(`${quantity}x ${products[currentProductIndex].title} wurde zum Warenkorb hinzugefügt!`);
+            closeModal();
+        });
+        
+        document.getElementById('buyNowBtn').addEventListener('click', function() {
+            openCheckoutModal();
+        });
+        
+        // Schließen des Modals beim Klicken außerhalb des Inhalts
+        window.onclick = function(event) {
+            const productModal = document.getElementById('productModal');
+            const checkoutModal = document.getElementById('checkoutModal');
+            
+            if (event.target == productModal) {
+                closeModal();
+            }
+            
+            if (event.target == checkoutModal) {
+                closeCheckoutModal();
+            }
+        }
+        
+        // Initialisierung
+        window.onload = function() {
+            createBackground();
+        };
+    </script>
+</body>
+</html>
