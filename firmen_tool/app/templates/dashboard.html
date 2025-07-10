@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Dashboard</h2>
+    <p>{{ greeting }}</p>
+    <p>Dies ist ein geschützter Bereich.</p>
+    {% if current_user.is_admin %}
+    <p>Als Administrator haben Sie erweiterte Rechte.</p>
+    <!-- Später hier: Links zu Admin-Funktionen wie Benutzerverwaltung -->
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ report.title }}</h2>
+<hr>
+<div>
+    <p><strong>Erstellt von:</strong> {{ report.author.username }}</p>
+    <p><strong>Erstellt am:</strong> {{ report.created_at.strftime('%d.%m.%Y %H:%M:%S UTC') }}</p>
+    <p><strong>Empfänger (simuliert):</strong> {{ report.recipients if report.recipients else 'Keine angegeben' }}</p>
+</div>
+<hr>
+<h3>Inhalt:</h3>
+<div class="report-content">
+    {{ report.content | safe }} {# 'safe' Filter, falls HTML im Bericht erlaubt sein soll, ansonsten escapen #}
+</div>
+<hr>
+<p>
+    <a href="{{ url_for('main.list_reports') }}" class="button-link">Zurück zur Berichtsübersicht</a>
+    {% if report.user_id == current_user.id or current_user.is_admin %}
+        <!-- <a href="#" class="button-link">Bericht bearbeiten</a> (Später implementieren) -->
+        <form method="POST" action="{{ url_for('main.delete_report', report_id=report.id) }}" style="display:inline; margin-left:10px;" onsubmit="return confirm('Sind Sie sicher, dass Sie diesen Bericht löschen möchten?');">
+            <button type="submit" class="button-danger button-small">Diesen Bericht löschen</button>
+        </form>
+    {% endif %}
+</p>
+
+<style>
+    .report-content {
+        background-color: #f9f9f9;
+        border: 1px solid #eee;
+        padding: 15px;
+        margin-top: 15px;
+        white-space: pre-wrap; /* Um Zeilenumbrüche und Leerzeichen im Text beizubehalten */
+        word-wrap: break-word; /* Um lange Wörter umzubrechen */
+    }
+    .button-link {
+        display: inline-block;
+        padding: 8px 12px;
+        margin-top:10px;
+        border: 1px solid #007bff;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #007bff;
+        background-color: white;
+    }
+    .button-link:hover {
+        background-color: #007bff;
+        color: white;
+    }
+    .button-danger.button-small { /* Spezifisch für den Löschbutton hier */
+        padding: 8px 12px; /* Angleichen an button-link padding */
+        color: white !important;
+    }
+</style>
+{% endblock %}

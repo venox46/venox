@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Aufgabe bearbeiten: {{ task.title }}</h2>
+<form method="POST" action="{{ url_for('main.edit_task', task_id=task.id) }}">
+    <p>
+        <label for="title">Titel:</label><br>
+        <input type="text" id="title" name="title" value="{{ task.title }}" required style="width: 100%;">
+    </p>
+    <p>
+        <label for="description">Beschreibung (optional):</label><br>
+        <textarea id="description" name="description" rows="5" style="width: 100%;">{{ task.description }}</textarea>
+    </p>
+    <p>
+        <label for="due_date">Fällig am (JJJJ-MM-TT, optional):</label><br>
+        <input type="date" id="due_date" name="due_date" value="{{ task.due_date.strftime('%Y-%m-%d') if task.due_date else '' }}" style="width: auto;">
+    </p>
+    <p>
+        <label for="priority">Priorität:</label><br>
+        <select id="priority" name="priority" style="width: auto;">
+            {% for p in priorities %}
+            <option value="{{ p }}" {% if task.priority == p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <label for="status">Status:</label><br>
+        <select id="status" name="status" style="width: auto;">
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if task.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <input type="submit" value="Änderungen speichern" class="button button-submit">
+        <a href="{{ url_for('main.list_tasks') }}" style="margin-left: 10px;">Abbrechen</a>
+    </p>
+</form>
+
+<style>
+    .button.button-submit {
+        background-color: #007bff; /* Blau für "Speichern" */
+    }
+    .button.button-submit:hover {
+        background-color: #0056b3;
+    }
+    input[type="text"], input[type="date"], textarea, select {
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+    select {
+        padding: 8px;
+    }
+</style>
+{% endblock %}

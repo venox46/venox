@@ -1,0 +1,8 @@
+Flask>=2.0
+Flask-SQLAlchemy>=2.5
+Flask-Login>=0.5
+Werkzeug>=2.0
+# Werkzeug ist oft eine Abhängigkeit von Flask, aber es ist gut, es explizit aufzuführen.
+# Versionen sind Beispiele und können je nach Bedarf angepasst werden.
+# Für maximale Kompatibilität könnten wir auch spezifischere Versionen pinnen,
+# aber für eine lokale Beta ist dies meist ausreichend.

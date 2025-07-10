@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Neue Aufgabe erstellen</h2>
+<form method="POST" action="{{ url_for('main.create_task') }}">
+    <p>
+        <label for="title">Titel:</label><br>
+        <input type="text" id="title" name="title" value="{{ task.title if task else '' }}" required style="width: 100%;">
+    </p>
+    <p>
+        <label for="description">Beschreibung (optional):</label><br>
+        <textarea id="description" name="description" rows="5" style="width: 100%;">{{ task.description if task else '' }}</textarea>
+    </p>
+    <p>
+        <label for="due_date">Fällig am (JJJJ-MM-TT, optional):</label><br>
+        <input type="date" id="due_date" name="due_date" value="{{ task.due_date if task and task.due_date else '' }}" style="width: auto;">
+    </p>
+    <p>
+        <label for="priority">Priorität:</label><br>
+        <select id="priority" name="priority" style="width: auto;">
+            {% for p in priorities %}
+            <option value="{{ p }}" {% if task and task.priority == p %}selected{% elif not task and p == 'Mittel' %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <label for="status">Status:</label><br>
+        <select id="status" name="status" style="width: auto;">
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if task and task.status == s %}selected{% elif not task and s == 'Offen' %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <input type="submit" value="Aufgabe erstellen" class="button button-submit">
+        <a href="{{ url_for('main.list_tasks') }}" style="margin-left: 10px;">Abbrechen</a>
+    </p>
+</form>
+
+<style>
+    .button.button-submit { /* Spezifischer Style für den Submit-Button hier */
+        background-color: #28a745; /* Grün */
+    }
+    .button.button-submit:hover {
+        background-color: #218838;
+    }
+    input[type="text"], input[type="date"], textarea, select {
+        box-sizing: border-box; /* Stellt sicher, dass padding/border in der Breite enthalten sind */
+        margin-bottom: 10px;
+    }
+    select {
+        padding: 8px; /* Etwas Padding für Selects */
+    }
+</style>
+{% endblock %}

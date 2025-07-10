@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Login</h2>
+    <form method="post">
+        <!-- CSRF Token wird später mit Flask-WTF hinzugefügt -->
+        <p>
+            <label for="username">Benutzername</label><br>
+            <input type="text" id="username" name="username" required>
+        </p>
+        <p>
+            <label for="password">Passwort</label><br>
+            <input type="password" id="password" name="password" required>
+        </p>
+        <p><input type="submit" value="Login"></p>
+    </form>
+    <p>Noch kein Konto? Bitte wenden Sie sich an den Administrator.</p>
+{% endblock %}

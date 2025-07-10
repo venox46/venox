@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Neuen Bericht erstellen</h2>
+<form method="POST" action="{{ url_for('main.create_report') }}">
+    <p>
+        <label for="title">Titel:</label><br>
+        <input type="text" id="title" name="title" required style="width: 100%;">
+    </p>
+    <p>
+        <label for="content">Inhalt:</label><br>
+        <textarea id="content" name="content" rows="10" required style="width: 100%;"></textarea>
+    </p>
+    <p>
+        <label for="recipients">Empfänger (E-Mail-Adressen, komma-getrennt, optional):</label><br>
+        <input type="text" id="recipients" name="recipients" style="width: 100%;">
+        <small>Hinweis: Der E-Mail-Versand ist in dieser Version noch nicht aktiv.</small>
+    </p>
+    <p>
+        <input type="submit" value="Bericht erstellen & Speichern" class="button">
+        <a href="{{ url_for('main.list_reports') }}" style="margin-left: 10px;">Abbrechen</a>
+    </p>
+</form>
+
+<style>
+    .button {
+        display: inline-block;
+        padding: 10px 15px; /* Etwas größer für Hauptaktionen */
+        margin-bottom: 10px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        background-color: #28a745; /* Grüner für "Erstellen" */
+        cursor: pointer;
+    }
+    .button:hover {
+        background-color: #218838;
+    }
+    input[type="text"], textarea { /* Bereits in style.css, aber hier zur Sicherheit nochmal für width */
+        box-sizing: border-box;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Meine Aufgaben</h2>
+<p><a href="{{ url_for('main.create_task') }}" class="button">Neue Aufgabe erstellen</a></p>
+
+{% if tasks %}
+<table>
+    <thead>
+        <tr>
+            <th>Titel</th>
+            <th>Status</th>
+            <th>Priorität</th>
+            <th>Fällig am</th>
+            <th>Erstellt am</th>
+            <th>Aktionen</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr class.status-{{ task.status | lower | replace(' ', '-') }}">
+            <td><a href="{{ url_for('main.edit_task', task_id=task.id) }}">{{ task.title }}</a></td>
+            <td>{{ task.status }}</td>
+            <td>{{ task.priority }}</td>
+            <td>{{ task.due_date.strftime('%d.%m.%Y') if task.due_date else '-' }}</td>
+            <td>{{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+            <td>
+                <a href="{{ url_for('main.edit_task', task_id=task.id) }}" class="button-small button-edit">Bearbeiten</a>
+                <form method="POST" action="{{ url_for('main.delete_task', task_id=task.id) }}" style="display:inline;" onsubmit="return confirm('Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?');">
+                    <button type="submit" class="button-danger button-small">Löschen</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Sie haben aktuell keine Aufgaben.</p>
+{% endif %}
+
+<style>
+    /* Allgemeine Button-Styles sind in base.html oder style.css, hier spezifische oder zusätzliche */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .button, .button-danger, .button-small, .button-edit {
+        display: inline-block;
+        padding: 8px 15px;
+        margin-bottom: 5px; /* Etwas weniger margin für Buttons in Tabellen */
+        margin-right: 5px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white !important;
+        cursor: pointer;
+        text-align: center;
+    }
+    .button { background-color: #007bff; }
+    .button:hover { background-color: #0056b3; }
+    .button-danger { background-color: #dc3545; }
+    .button-danger:hover { background-color: #c82333; }
+    .button-small { padding: 5px 10px; font-size: 0.9em; }
+    .button-edit { background-color: #ffc107; color: #212529 !important; } /* Gelb für Bearbeiten */
+    .button-edit:hover { background-color: #e0a800; }
+
+    /* Optional: Styling basierend auf Task-Status */
+    .status-offen { /* Nichts besonderes */ }
+    .status-in-arbeit { background-color: #fff8e1; } /* Leicht gelblich */
+    .status-erledigt { background-color: #e8f5e9; text-decoration: line-through; color: #757575; }
+    .status-erledigt a { color: #757575 !important; }
+
+</style>
+{% endblock %}

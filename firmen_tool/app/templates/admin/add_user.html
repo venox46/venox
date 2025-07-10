@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Neuen Benutzer hinzufügen</h2>
+<form method="POST" action="{{ url_for('main.add_user') }}">
+    <!-- CSRF Token hier einfügen, wenn Flask-WTF verwendet wird -->
+    <p>
+        <label for="username">Benutzername:</label><br>
+        <input type="text" id="username" name="username" required>
+    </p>
+    <p>
+        <label for="password">Passwort:</label><br>
+        <input type="password" id="password" name="password" required>
+    </p>
+    <p>
+        <input type="checkbox" id="is_admin" name="is_admin">
+        <label for="is_admin">Ist Administrator?</label>
+    </p>
+    <p>
+        <input type="submit" value="Benutzer erstellen" class="button">
+        <a href="{{ url_for('main.list_users') }}" style="margin-left: 10px;">Abbrechen</a>
+    </p>
+</form>
+
+<style>
+    .button {
+        display: inline-block;
+        padding: 8px 15px;
+        margin-bottom: 10px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+        cursor: pointer;
+    }
+    .button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}

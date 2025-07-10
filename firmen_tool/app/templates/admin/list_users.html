@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Benutzerverwaltung</h2>
+<p><a href="{{ url_for('main.add_user') }}" class="button">Neuen Benutzer hinzufügen</a></p>
+
+{% if users %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Benutzername</th>
+            <th>Admin?</th>
+            <th>Aktionen</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{% if user.is_admin %}Ja{% else %}Nein{% endif %}</td>
+            <td>
+                {% if user.id != current_user.id %}
+                <form method="POST" action="{{ url_for('main.delete_user', user_id=user.id) }}" style="display:inline;" onsubmit="return confirm('Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?');">
+                    <!-- Hier wäre ein CSRF-Token wichtig, wenn Flask-WTF verwendet wird -->
+                    <input type.hidden name="csrf_token" value="dummy_token_fuer_spaeter">
+                    <button type="submit" class="button-danger">Löschen</button>
+                </form>
+                {% else %}
+                (Aktueller Benutzer)
+                {% endif %}
+                <!-- Später: Bearbeiten-Link -->
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Keine Benutzer gefunden.</p>
+{% endif %}
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .button, .button-danger {
+        display: inline-block;
+        padding: 8px 15px;
+        margin-bottom: 10px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        cursor: pointer;
+    }
+    .button {
+        background-color: #007bff;
+    }
+    .button:hover {
+        background-color: #0056b3;
+    }
+    .button-danger {
+        background-color: #dc3545;
+    }
+    .button-danger:hover {
+        background-color: #c82333;
+    }
+</style>
+{% endblock %}
